@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Ceremony You Deserved</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060a1a;--bg2:#0f1633;--gold:#e4c067;--ink:#f6f1ea;--soft:#b9bdd6;--rose:#f2a7bd;
+--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;--sans:'Jost',system-ui,-apple-system,'Segoe UI',sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:radial-gradient(ellipse at 50% 0%,var(--bg2),var(--bg) 70%);color:var(--ink);font-family:var(--sans);font-weight:300;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.scene{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 1.4s ease;overflow-y:auto}
+.scene.on{opacity:1;pointer-events:auto}
+h1,h2,.name{font-family:var(--serif);font-weight:400;margin:0}
+.name{font-size:clamp(2.6rem,10vw,5rem);letter-spacing:.06em;color:var(--ink);text-shadow:0 0 30px rgba(246,241,234,.35)}
+h2{font-size:clamp(1.6rem,5vw,2.4rem);font-style:italic;color:var(--soft)}
+.rule{width:min(240px,60%);height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:26px auto}
+p{max-width:34em;line-height:1.7;color:var(--soft)}
+button{font:inherit;font-family:var(--sans);letter-spacing:.12em;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid rgba(228,192,103,.55);border-radius:999px;padding:13px 34px;cursor:pointer;transition:background .3s,box-shadow .3s,opacity 1s}
+button:hover,button:focus-visible{background:rgba(228,192,103,.14);box-shadow:0 0 22px rgba(228,192,103,.3);outline:none}
+.hid{opacity:0;pointer-events:none}
+.moon{width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffdf3,#e8e1c8 60%,#cfc7a6);box-shadow:0 0 60px 14px rgba(255,250,225,.3);margin-bottom:34px;animation:glow 6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 90px 24px rgba(255,250,225,.42)}}
+.lead{font-family:var(--serif);font-size:clamp(1.3rem,4vw,1.7rem);font-style:italic;color:var(--soft);margin:0 0 6px}
+/* walk */
+.path{display:flex;flex-direction:column;align-items:center;margin:18px 0 28px}
+.row{display:flex;opacity:0;transform:scale(.6);transition:opacity 1s,transform 1s}
+.row.show{opacity:1;transform:scale(1)}
+.stage{width:110px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 40px 16px rgba(228,192,103,.4);margin-bottom:22px;opacity:.3;transition:opacity 2s}
+/* certificate */
+.cert{position:relative;width:min(560px,92vw);padding:46px 24px;border:1px solid var(--gold);outline:1px solid rgba(228,192,103,.35);outline-offset:8px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015));opacity:0;transform:scale(.92);transition:opacity 2.2s,transform 2.2s}
+.on .cert{opacity:1;transform:scale(1)}
+.cert .sm{font-family:var(--serif);letter-spacing:.35em;color:var(--soft);font-size:.95rem}
+.cert .big{font-family:var(--serif);font-size:clamp(1.7rem,6vw,2.5rem);letter-spacing:.18em;margin:6px 0 18px}
+.honor{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,8vw,3.3rem);letter-spacing:.2em;background:linear-gradient(100deg,#b8892f 20%,#fff1b8 45%,#e4c067 55%,#b8892f 80%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:-250% 0}}
+.side{position:absolute;top:50%;font-size:2rem;transform:translateY(-50%)}
+.side.l{left:-18px}.side.r{right:-18px}
+/* garden */
+.garden{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;max-width:560px;margin:20px 0}
+.fl{background:none;border:none;box-shadow:none;padding:6px;font-size:3.2rem;filter:grayscale(.9) brightness(.7);transform:scale(.55);transition:transform 1.2s cubic-bezier(.2,1.6,.4,1),filter 1.2s}
+.fl.open{filter:none;transform:scale(1.15)}
+.fl:hover{background:none}
+.msg{min-height:7.5em;max-width:28em}
+.msg b{font-family:var(--serif);font-size:1.5rem;font-weight:400;font-style:italic;color:var(--ink)}
+/* letter */
+.paper{position:relative;width:min(520px,92vw);padding:42px 30px 50px;background:#f3ead8;color:#4a3a2e;border-radius:3px;box-shadow:0 20px 60px rgba(0,0,0,.55);transform:rotate(-1deg);text-align:left;opacity:0;transition:opacity 2s}
+.on .paper{opacity:1}
+.paper h2{color:#7a3b4b;text-align:center;margin-bottom:14px}
+.paper p{color:#4a3a2e;font-family:var(--serif);font-size:1.12rem;line-height:1.65;margin:0 0 14px;max-width:none}
+.paper p:last-child{text-align:right;font-family:'Great Vibes','Brush Script MT','Segoe Script',cursive;font-size:2.3rem;line-height:1.2;color:#7a3b4b;margin:6px 8px 0 0}
+.seal{position:absolute;right:22px;bottom:-22px;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c4455f,#7d1d33);display:grid;place-items:center;font-size:1.5rem;box-shadow:0 6px 14px rgba(0,0,0,.4)}
+/* bouquet */
+.bq{font-size:clamp(2.4rem,9vw,3.6rem);line-height:1.1;cursor:pointer;user-select:none;margin:6px 0 22px;transition:transform 1.6s cubic-bezier(.2,1.4,.4,1)}
+.bq.up{transform:scale(1.3) translateY(-10px)}
+.bq span{display:block}
+.fade{opacity:0;transition:opacity 2s}.fade.show{opacity:1}
+.fl svg{width:64px;height:64px;display:block;filter:drop-shadow(0 0 8px rgba(255,255,255,.15))}
+.side svg{width:46px;height:46px;display:block}
+.bq svg{width:min(290px,72vw);height:auto;display:block;overflow:visible}
+.seal svg{width:34px;height:34px}
+.fin{display:flex;gap:10px;justify-content:center;margin:12px 0}.fin svg{width:44px;height:44px}
+.scene{overflow-x:hidden}
+.vn{position:absolute;width:128px;height:128px;pointer-events:none}
+.vn.tl{top:-26px;left:-26px}.vn.tr{top:-26px;right:-26px;transform:scaleX(-1)}
+.vn.bl{bottom:-26px;left:-26px;transform:scaleY(-1)}.vn.br{bottom:-26px;right:-26px;transform:scale(-1,-1)}
+.vn .stem{fill:none;stroke:#6fa07a;stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1}
+.vn .lf,.vn .bl2{opacity:0}
+.on .vn .stem{animation:draw 3.6s ease forwards .6s}
+.on .vn .lf,.on .vn .bl2{animation:pop 1.2s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+.vn .lf,.vn .bl2{transform-box:fill-box;transform-origin:center}
+.photos{display:flex;gap:14px;margin-top:34px;justify-content:center;flex-wrap:wrap}
+.photos img{width:112px;height:132px;object-fit:cover;border:6px solid #f3ead8;border-bottom-width:24px;box-shadow:0 10px 26px rgba(0,0,0,.5);transform:rotate(var(--r))}
+#mute{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:5;padding:8px 14px;letter-spacing:0;display:none}
+.wi{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;pointer-events:none}
+.wi svg{width:100%;height:100%;display:block;overflow:visible}
+#world,#pathEl,#stg{position:absolute;inset:0}
+#pathEl{background:linear-gradient(to bottom,rgba(228,192,103,0),rgba(228,192,103,.2))}
+#stg{inset:auto;left:0;top:0;border-radius:50%;background:radial-gradient(ellipse,rgba(255,236,170,.95),rgba(228,192,103,.45) 40%,transparent 70%);transform-origin:50% 50%;opacity:0}
+#cap{position:absolute;top:19vh;left:0;right:0;padding:0 24px;font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,5vw,2.2rem);color:var(--ink);text-shadow:0 0 24px rgba(246,241,234,.5);opacity:0;pointer-events:none;z-index:5000}
+#hint{position:absolute;bottom:9vh;letter-spacing:.3em;color:var(--soft);font-size:.78rem;z-index:5000;animation:nudge 2.4s ease-in-out infinite;transition:opacity 1s}
+@keyframes nudge{50%{transform:translateY(8px);opacity:.5}}
+.scene{justify-content:safe center}
+.merit{font-family:var(--serif);letter-spacing:.35em;color:var(--gold);font-size:clamp(.9rem,3vw,1.2rem);margin-top:6px;text-shadow:0 0 14px rgba(228,192,103,.5)}
+#stars{display:flex;gap:4px;justify-content:center}
+.star{background:none;border:none;box-shadow:none;padding:4px;transition:transform .25s}
+.star:hover{background:none;transform:scale(1.2) rotate(-6deg);box-shadow:none}
+.star svg{width:40px;height:40px;fill:rgba(255,255,255,.1);stroke:var(--gold);stroke-width:1.2;transition:fill .25s,filter .25s}
+.star.lit svg{fill:var(--gold);filter:drop-shadow(0 0 8px rgba(228,192,103,.7))}
+#gif{width:min(280px,72vw);margin:10px auto 0}#gif img{width:100%;border-radius:10px}
+.inv{position:relative;width:min(440px,86vw);padding:34px 26px 26px;border:1px solid var(--gold);outline:1px solid rgba(228,192,103,.3);outline-offset:7px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015));box-shadow:0 0 60px rgba(228,192,103,.08)}
+.kick{letter-spacing:.32em;font-size:.7rem;color:var(--gold)}
+.cvt{font-size:clamp(2rem,9vw,3.2rem);letter-spacing:.14em}
+.cv-i{opacity:0}
+.on .cv-i{animation:rise 1.1s ease forwards;animation-delay:var(--d,0s)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.stub{border-top:2px dashed rgba(228,192,103,.4);margin-top:20px;padding-top:14px}
+.stub dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 16px;text-align:left}
+.stub dt{font-size:.66rem;letter-spacing:.22em;color:var(--gold);align-self:center}
+.stub dd{margin:0;font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="mute" aria-label="Toggle music">♪</button>
+
+<!-- 1 Opening -->
+<section class="scene" id="s0">
+  <div class="moon" style="width:58px;height:58px;margin-bottom:20px"></div>
+  <div class="inv">
+    <div class="vn tl"></div><div class="vn tr"></div><div class="vn bl"></div><div class="vn br"></div>
+    <div class="cv-i kick" style="--d:.3s" id="cvKick"></div>
+    <div class="cv-i lead" style="--d:.7s;margin:6px 0 2px" id="cvLine"></div>
+    <div class="cv-i" style="--d:1.1s"><div class="honor cvt" id="cvTitle"></div></div>
+    <div class="cv-i name" data-name style="--d:1.5s;font-size:clamp(1.7rem,7vw,2.4rem);margin-top:8px"></div>
+    <div class="cv-i stub" style="--d:1.9s"><dl id="cvDet"></dl></div>
+  </div>
+  <button id="enter" class="cv-i" style="--d:2.5s;margin-top:28px"></button>
+</section>
+
+<!-- 2 Walk -->
+<section class="scene" id="s1" style="padding:0;overflow:hidden;touch-action:none">
+  <div id="world"><div id="pathEl"></div><div id="stg"></div></div>
+  <div class="moon" style="position:absolute;top:6vh;width:60px;height:60px;margin:0"></div>
+  <div id="cap"></div>
+  <div id="hint">SCROLL OR SWIPE TO WALK ↓</div>
+  <button id="b1" class="hid" style="position:absolute;bottom:8vh;z-index:6000">STEP ONTO THE STAGE</button>
+</section>
+
+<!-- 3 Recognition -->
+<section class="scene" id="s2">
+  <div class="cert">
+    <div class="vn tl"></div><div class="vn tr"></div><div class="vn bl"></div><div class="vn br"></div><span class="side l"></span><span class="side r"></span>
+    <div class="sm">CERTIFICATE OF</div>
+    <div class="big">ACHIEVEMENT</div>
+    <div class="rule" style="margin:14px auto"></div>
+    <div class="name" data-name style="font-size:clamp(1.9rem,7vw,3rem)"></div>
+    <div class="rule" style="margin:14px auto"></div>
+    <div class="honor">HONOR</div><div class="merit">(YELLOW MERIT)</div>
+  </div>
+  <p></p>
+  <button id="b2" class="hid">CONTINUE</button>
+</section>
+
+<!-- 4 Applause -->
+<section class="scene" id="s3">
+  <div class="fade" id="apName"><div class="name" data-name></div><div class="rule"></div><div class="honor" style="font-size:clamp(2.4rem,10vw,4.4rem)">HONOR</div><div class="merit">(YELLOW MERIT)</div></div>
+  <p class="fade" id="apTxt" style="margin-top:26px">The applause you missed, gathered here.</p>
+  <button id="b3" class="hid" style="margin-top:12px">CONTINUE</button>
+</section>
+
+<!-- 5 Garden -->
+<section class="scene" id="s4">
+  <h2>The garden</h2>
+  <p style="margin:6px 0 0">Touch each flower.</p>
+  <div class="garden" id="garden"></div>
+  <p class="msg" id="msg"></p>
+  <button id="b4" class="hid">CONTINUE</button>
+</section>
+
+<!-- 6 Letter -->
+<section class="scene" id="s5">
+  <div class="paper">
+    <h2>For you ♡</h2>
+    <div id="letter"></div>
+    <div class="seal"></div>
+  </div>
+  <div class="photos" id="photos"></div>
+  <button id="b5" style="margin-top:36px">CONTINUE</button>
+</section>
+
+<!-- 7 Bouquet -->
+<section class="scene" id="s6">
+  <div class="name fade" id="bqName" data-name style="font-size:clamp(2rem,8vw,3.4rem)"></div>
+  <div class="bq" id="bq"></div>
+  <p class="fade" id="bqTxt"></p>
+  <button id="pick">PICK UP BOUQUET</button>
+  <button id="b6" class="hid" style="margin-top:14px">CONTINUE</button>
+</section>
+
+<!-- 8 Final -->
+<section class="scene" id="s7">
+  <div class="moon"></div>
+  <div class="name" data-name></div>
+  <div class="honor" style="margin:10px 0 0">HONOR</div><div class="merit">(YELLOW MERIT)</div>
+  <div class="fin" id="fin"></div>
+  <div class="rule"></div>
+  <p class="fade" id="keepTxt"></p>
+  <p class="lead" style="margin:6px 0 2px">How was your ceremony?</p>
+  <div id="stars"></div>
+  <p class="fade" id="rmsg" style="margin:6px 0"></p>
+  <div id="gif"></div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+    <button id="again">↺ EXPERIENCE AGAIN</button>
+    <button id="keep">🌸 KEEP THIS MOMENT</button>
+  </div>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+/* ✎ EDIT HERE — name, flower messages, letter, closing line.
+   You can also set the name via the link: ...?name=Anna */
+const CFG={
+  name:new URLSearchParams(location.search).get('name')||'Saintness',
+  music:'taylor_swift.mp3',   // background music, loops through the whole ceremony ('' = none)
+  applause:'applause.mp3',    // plays once during the applause scene, then stops ('' = none)
+  photos:[], // image paths like 'photo1.jpg' (same folder), shown under the letter
+  walk:['You worked so hard for this','You were missed','Tonight, it is all for you'], // lines shown at the three arches
+  five:'Of course it was. You earned every star.',
+  notFive:'WHAT?! Do you not love me now :((',
+  tenorId:'15884535962552606625', // Tenor GIF shown for any rating below 5 (needs internet; blocked on the claude.ai link)
+  gifFile:'reaction.gif',          // gif sitting next to this html, played for any rating below 5 ('' = use Tenor instead)
+  cover:{kicker:'YOU ARE CORDIALLY INVITED',line:'to your very own',title:'CEREMONY',button:'TAKE YOUR SEAT',
+    details:[['ADMIT','One very deserving human'],['SEAT','Front row, reserved'],['DRESS CODE','Pajamas encouraged'],['APPLAUSE','Guaranteed']]},
+  recognition:'You earned this. It was never going to disappear.',
+  flowers:[
+    {k:'rose',t:'Rose — Achievement',m:`For every goal you’ve reached and every sleepless night that brought you closer to where you are today.`},
+    {k:'tulip',t:'Tulip — Affection',m:`A little reminder of the love and affection I hold for you, always.`},
+    {k:'blossom',t:'Sakura Blossom — Growth',m:`For how much you’ve grown, even through the moments that weren’t easy. I’m proud of the person you’re becoming.`},
+    {k:'daisy',t:'Daisy — Joy',m:`Because you bring so much happiness into my life just by being you.`},
+    {k:'sunflower',t:'Sunflower — Pride',m:`For how incredibly proud I am of you, your efforts, your strength, and everything you continue to accomplish.`}
+  ],
+  letter:[
+    `Saintness,`,
+    `I know those sleepless nights haven't been easy on you. I know there's always so much running through your mind, so many things you carry quietly, and yet you still continue to be an amazing person and give your best. I hope you know how proud I am of you. Not just for what you accomplish, but for how hard you continue to try even when you’re tired.`,
+    `You're genuinely such a special and amazing person. There's something about the way you care, the way you keep going, and the way you put your heart into the things that matter to you that makes me admire you more than I can properly put into words. Please don't ever think that your efforts go unnoticed, because I see them. I see you.`,
+    `Even on the nights when you feel like you haven't done enough, I hope you remember that you are already enough. You deserve rest, kindness, and someone who reminds you just how wonderful you are when you forget it yourself.`,
+    `So, my love, please be proud of yourself. For every late night, every tired morning, every little struggle you pushed through. You did well and everything was not for nothing:)) And I’ll always be here, cheering for you and believing in you. ILYYYY`,
+    `Sol`
+  ],
+  bouquet:'These are yours to keep.',
+  keep:'I love you so much, congratsss'
+};
+
+const ring=(n,x,o=0)=>Array.from({length:n},(_,i)=>`<g transform="rotate(${i*360/n+o} 50 50)">${x}</g>`).join('');
+const F={
+rose:ring(6,'<circle cx="50" cy="20" r="17" fill="#a3203b"/>')+'<circle cx="50" cy="50" r="33" fill="#c43150"/><path d="M26 50a24 22 0 1 1 8 17" fill="none" stroke="#8a1830" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="19" fill="#d6405f"/><path d="M38 50a12 11 0 1 1 5 9" fill="none" stroke="#8a1830" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="6" fill="#a3203b"/>',
+tulip:'<path d="M26 62C22 30 32 14 36 12L50 34L64 12C68 14 78 30 74 62C70 86 30 86 26 62Z" fill="#ee7f9d"/><path d="M50 34L36 12C30 40 36 70 50 82C64 70 70 40 64 12Z" fill="#f8aec2"/>',
+blossom:ring(5,'<path d="M50 50C34 38 38 14 45 10L50 19L55 10C62 14 66 38 50 50Z" fill="#f7b6c9"/>')+ring(5,'<line x1="50" y1="50" x2="50" y2="36" stroke="#e4c067" stroke-width="1.6"/><circle cx="50" cy="35" r="1.8" fill="#e4c067"/>',36)+'<circle cx="50" cy="50" r="5" fill="#e4c067"/>',
+daisy:ring(12,'<ellipse cx="50" cy="26" rx="6" ry="20" fill="#fbf7ef"/>')+'<circle cx="50" cy="50" r="11" fill="#f0b90b"/>',
+sunflower:ring(16,'<ellipse cx="50" cy="24" rx="6.5" ry="21" fill="#e89f00"/>',11)+ring(16,'<ellipse cx="50" cy="24" rx="6.5" ry="21" fill="#f6bd16"/>')+'<circle cx="50" cy="50" r="17" fill="#5b3516"/><circle cx="50" cy="50" r="10" fill="#3f240d"/>'};
+const fl=(k,s)=>`<svg viewBox="0 0 100 100" width="${s}" height="${s}" aria-hidden="true">${F[k]}</svg>`;
+function bouquet(full){
+ const P=full?[[95,70,52,'daisy'],[205,70,52,'sunflower'],[150,52,56,'blossom'],[55,100,52,'blossom'],[245,100,52,'daisy'],[105,98,62,'tulip'],[195,98,62,'tulip'],[150,86,68,'rose'],[62,138,56,'sunflower'],[238,138,56,'rose'],[112,138,64,'rose'],[188,138,64,'blossom'],[150,132,72,'rose'],[85,162,54,'blossom'],[215,162,54,'daisy'],[125,168,52,'tulip'],[175,168,52,'sunflower'],[150,160,50,'blossom']]:[[124,98,50,'daisy'],[176,98,50,'blossom'],[150,110,70,'rose'],[104,130,58,'tulip'],[196,130,58,'blossom']];
+ const leaf=(d)=>`<path d="${d}" fill="#3d7a4d"/>`;
+ return `<svg viewBox="0 0 300 290">${leaf('M150 250Q60 205 50 175Q112 185 150 250Z')+leaf('M150 250Q240 205 250 175Q188 185 150 250Z')+leaf('M150 250Q120 170 150 120Q180 170 150 250Z')}`
+ +P.map(p=>`<line x1="${p[0]}" y1="${p[1]}" x2="150" y2="252" stroke="#4f8a5b" stroke-width="3"/>`).join('')
+ +'<path d="M104 190L196 190L162 280L138 280Z" fill="rgba(255,255,255,.14)" stroke="rgba(228,192,103,.5)"/>'
+ +P.map(p=>`<svg x="${p[0]-p[2]/2}" y="${p[1]-p[2]/2}" width="${p[2]}" height="${p[2]}" viewBox="0 0 100 100">${F[p[3]]}</svg>`).join('')
+ +'<path d="M150 246L124 232L128 262ZM150 246L176 232L172 262Z" fill="#e4c067"/><circle cx="150" cy="247" r="6" fill="#c9a24a"/></svg>';
+}
+document.querySelectorAll('.side').forEach(e=>e.innerHTML=fl('rose','46'));
+document.querySelector('.seal').innerHTML=fl('rose','34');
+document.getElementById('fin').innerHTML=['rose','tulip','blossom','daisy','sunflower'].map(k=>fl(k,'44')).join('');
+document.getElementById('bq').innerHTML=bouquet(false);
+const leaf=(x,y,r,d)=>`<path class="lf" style="animation-delay:${d}s" transform="translate(${x} ${y}) rotate(${r})" d="M0 0C6-9 18-9 22 0C16 9 6 9 0 0Z" fill="#4f8a5b"/>`;
+const bl=(k,x,y,s,d)=>`<svg class="bl2" style="animation-delay:${d}s" x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}" viewBox="0 0 100 100">${F[k]}</svg>`;
+const CORNER=`<svg viewBox="0 0 128 128"><path class="stem" pathLength="1" d="M8 122C6 90 28 70 20 42S42 8 80 10S112 12 124 6"/><path class="stem" pathLength="1" d="M20 42C34 44 40 54 34 62C28 66 24 60 28 56" style="animation-delay:1.4s"/>`
++leaf(10,100,-100,2)+leaf(14,74,-60,2.3)+leaf(24,40,-120,2.6)+leaf(40,12,-10,2.9)+leaf(66,12,20,3.2)+leaf(96,12,-15,3.5)+leaf(34,64,30,3)
++bl('rose',13,13,30,3.8)+bl('blossom',22,41,17,3.4)+bl('blossom',82,11,16,4)+bl('daisy',120,8,14,4.3)+bl('blossom',9,112,14,3.2)+'</svg>';
+document.querySelectorAll('.vn').forEach(e=>e.innerHTML=CORNER);
+const bg=CFG.music?Object.assign(new Audio(CFG.music),{loop:true,volume:.5}):null;
+const au=CFG.applause?Object.assign(new Audio(CFG.applause),{loop:false,volume:.85}):null;
+const ramp=(a,v)=>{if(!a)return;clearInterval(a._i);a._i=setInterval(()=>{a.volume=Math.max(0,Math.min(1,a.volume+(v-a.volume)*.2));if(Math.abs(a.volume-v)<.015){a.volume=v;clearInterval(a._i)}},60)};
+function endApplause(){if(au){au.pause();au.currentTime=0}ramp(bg,.5)}
+if(au)au.addEventListener('ended',()=>ramp(bg,.5));
+[bg,au].forEach(a=>a&&a.addEventListener('loadedmetadata',()=>$('mute').style.display='block'));
+$('mute').onclick=()=>{const m=!(bg||au).muted;[bg,au].forEach(a=>a&&(a.muted=m));$('mute').textContent=m?'♪̸':'♪'};
+$('photos').innerHTML=CFG.photos.map((p,i)=>`<img src="${p}" alt="" style="--r:${(i%2?3:-3)-i}deg">`).join('');
+document.querySelectorAll('[data-name]').forEach(e=>e.textContent=CFG.name);
+$('cvKick').textContent=CFG.cover.kicker;$('cvLine').textContent=CFG.cover.line;$('cvTitle').textContent=CFG.cover.title;$('enter').textContent=CFG.cover.button;
+$('cvDet').innerHTML=CFG.cover.details.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('');
+document.querySelector('#s2 p').textContent=CFG.recognition;
+document.getElementById('bqTxt').textContent=CFG.bouquet;
+document.getElementById('keepTxt').textContent=CFG.keep;
+document.getElementById('letter').innerHTML=CFG.letter.map(t=>'<p></p>').join('');
+document.querySelectorAll('#letter p').forEach((p,i)=>p.textContent=CFG.letter[i]);
+
+/* ---------- canvas: stars + petals ---------- */
+const cv=document.getElementById('c'),cx=cv.getContext('2d');let W,H,dpr=Math.min(devicePixelRatio||1,2);
+function size(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0)}
+size();addEventListener('resize',size);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const stars=Array.from({length:170},(_,i)=>({x:rnd(0,1),y:rnd(0,1),r:rnd(.4,1.8),p:rnd(0,6.3),a:0,i,ang:rnd(0,6.28),rad:rnd(70,260)}));
+let starVis=0,gather=0,petals=[],rate=.02,scene=0,t0=performance.now();
+function spawn(x,y,burst){petals.push({x:x??rnd(0,W),y:y??-20,s:rnd(5,10),r:rnd(0,6.3),vr:rnd(-.03,.03),vx:burst?rnd(-3,3):rnd(-.3,.5),vy:burst?rnd(-4,-1):rnd(.5,1.3),c:Math.random()<.6?'#f2a7bd':'#fbe3ea',w:rnd(0,6)})}
+function burst(n){for(let i=0;i<n;i++)spawn(W/2+rnd(-60,60),H*.6,true)}
+function frame(now){
+  const t=(now-t0)/1000;cx.clearRect(0,0,W,H);
+  cx.fillStyle='#fff';
+  const cxn=W/2,cyn=H/2-10;
+  stars.forEach(s=>{
+    const target=s.i<starVis?1:0;s.a+=(target-s.a)*.03;if(s.a<.01)return;
+    let x=s.x*W,y=s.y*H;
+    if(gather>0){const gx=cxn+Math.cos(s.ang+t*.15)*s.rad*(W<600?.8:1.4),gy=cyn+Math.sin(s.ang+t*.15)*s.rad*.8;x+=(gx-x)*gather;y+=(gy-y)*gather}
+    cx.globalAlpha=s.a*(.55+.45*Math.sin(t*1.5+s.p));
+    cx.beginPath();cx.arc(x,y,s.r,0,6.3);cx.fill()
+  });
+  if(Math.random()<rate)spawn();
+  petals=petals.filter(p=>p.y<H+30);
+  petals.forEach(p=>{p.w+=.02;p.x+=p.vx+Math.sin(p.w)*.5;p.y+=p.vy;p.vy+=p.vy<1.2?.04:0;p.r+=p.vr;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.globalAlpha=.85;cx.fillStyle=p.c;
+    cx.beginPath();cx.ellipse(0,0,p.s,p.s*.55,0,0,6.3);cx.fill();cx.restore()});
+  cx.globalAlpha=1;requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+/* ---------- scenes ---------- */
+const S=[...document.querySelectorAll('.scene')];
+const RATES=[.01,.06,.08,.12,.15,.1,.2,.28];
+const STARS=[40,70,90,0,110,110,130,170];
+const show=(id,ms)=>setTimeout(()=>$(id).classList.remove('hid'),ms);
+function go(i){
+  if(i!==3)endApplause();
+  scene=i;S.forEach((s,k)=>s.classList.toggle('on',k===i));
+  rate=RATES[i];starVis=STARS[i];gather=0;
+  if(i===1)startWalk();if(i===2)show('b2',4500);if(i===3)applause();
+  if(i===7){gather=.6;starVis=170;burst(40)}
+}
+function applause(){
+  starVis=0;ramp(bg,.1);if(au){au.currentTime=0;au.play().catch(()=>{})}
+  [['apName',2200],['apTxt',9500]].forEach(([id,ms])=>setTimeout(()=>$(id).classList.add('show'),ms));
+  let n=0;const iv=setInterval(()=>{if(scene!==3){clearInterval(iv);return}
+    n=n<4?n+1:Math.min(170,Math.round(n*1.45));starVis=n;if(n>=170)clearInterval(iv)},600);
+  setTimeout(()=>{if(scene===3){gather=.55;rate=.35}},6000);
+  show('b3',10500)
+}
+
+/* ---------- the walk ---------- */
+const WALK={L:13.5,items:[],c:0,tgt:0,done:false,arches:[3.6,7,10.4]};
+const arch=()=>'<svg viewBox="0 0 200 240"><path d="M24 240V100A76 76 0 0 1 176 100V240" fill="none" stroke="#e4c067" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 6px #e4c067)"/><path d="M34 240V102A66 66 0 0 1 166 102V240" fill="none" stroke="#5b8f66" stroke-width="2.5"/>'
+ +[[34,200,-80],[30,150,-100],[40,110,-60],[62,62,-30],[100,30,0],[138,62,30],[160,110,60],[170,150,100],[166,200,80]].map(([x,y,r])=>`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 0C5-8 15-8 18 0C13 8 5 8 0 0Z" fill="#4f8a5b"/>`).join('')
+ +[['rose',100,22,34],['blossom',44,72,22],['blossom',156,72,22],['daisy',24,130,20],['tulip',176,130,20],['blossom',28,190,18],['daisy',172,190,18]].map(([k,x,y,z])=>`<svg x="${x-z/2}" y="${y-z/2}" width="${z}" height="${z}" viewBox="0 0 100 100">${F[k]}</svg>`).join('')+'</svg>';
+const plant=k=>`<svg viewBox="0 0 100 150"><path d="M50 66Q44 110 50 150" stroke="#4f8a5b" stroke-width="3" fill="none"/><path d="M48 112Q22 100 18 118Q36 126 48 112Z" fill="#4f8a5b"/><path d="M50 98Q76 88 82 104Q64 112 50 98Z" fill="#4f8a5b"/><svg x="15" y="0" width="70" height="70" viewBox="0 0 100 100">${F[k]}</svg></svg>`;
+function startWalk(){
+  const world=$('world');world.querySelectorAll('.wi').forEach(e=>e.remove());WALK.items=[];WALK.c=WALK.tgt=0;WALK.done=false;
+  $('hint').style.opacity=1;$('b1').classList.add('hid');
+  const add=(html,x,d,bw,bh,wu,wrap)=>{const e=document.createElement('div');e.className='wi';e.innerHTML=html;e.style.width=bw+'px';e.style.height=bh+'px';world.appendChild(e);WALK.items.push({e,x,d,bw,bh,wu,wrap})};
+  WALK.arches.forEach(d=>add(arch(),0,d,200,240,2.6));
+  const kinds=['rose','tulip','blossom','daisy','sunflower'];
+  for(let i=0;i<46;i++)add(plant(kinds[i%5]),(i%2?1:-1)*rnd(1.5,3.8),rnd(1,14.5),100,150,.75);
+  for(let i=0;i<44;i++)add('<svg viewBox="0 0 10 6"><ellipse cx="5" cy="3" rx="5" ry="2.6" fill="#f2a7bd"/></svg>',rnd(-.8,.8),rnd(0,12),10,6,.09,true);
+  walkLoop()
+}
+function walkLoop(){
+  if(scene!==1)return;
+  const hy=H*.42,k=H*.5,kx=Math.min(W*.42,k),c=WALK.c+=(WALK.tgt-WALK.c)*.1;
+  $('pathEl').style.clipPath=`polygon(${W/2-5}px ${hy}px,${W/2+5}px ${hy}px,${W/2+1.05*kx}px ${H}px,${W/2-1.05*kx}px ${H}px)`;
+  WALK.items.forEach(it=>{
+    let z=it.d-c;if(it.wrap)z=((z%12)+12)%12+.4;
+    if(z<.55||z>11){it.e.style.opacity=0;return}
+    const sc=it.wu*kx/z/it.bw,sx=W/2+it.x*kx/z,sy=hy+k/z;
+    it.e.style.transform=`translate(${sx-it.bw*sc/2}px,${sy-it.bh*sc}px) scale(${sc})`;
+    it.e.style.opacity=Math.min(1,(11-z)/3,(z-.55)/.6);it.e.style.zIndex=Math.round(1000/z)
+  });
+  const zs=WALK.L+2-c,sw=7*kx/zs,st=$('stg').style;
+  st.width=sw+'px';st.height=sw*.5+'px';st.transform=`translate(${W/2-sw/2}px,${hy+k/zs-sw*.25}px)`;st.opacity=.3+.7*(c/WALK.L);
+  let best=0,txt='';const caps=[{d:1.5,t:'Tonight, we celebrate you'},...WALK.arches.map((d,i)=>({d:d-.2,t:CFG.walk[i]||''}))];
+  caps.forEach(p=>{const a=Math.max(0,1-Math.abs(p.d-c-1.5)/1.5);if(a>best){best=a;txt=p.t}});
+  $('cap').textContent=txt;$('cap').style.opacity=best;
+  if(c>.4)$('hint').style.opacity=0;
+  if(!WALK.done&&WALK.tgt>=WALK.L-.2){WALK.done=true;$('b1').classList.remove('hid')}
+  requestAnimationFrame(walkLoop)
+}
+const step=d=>{if(scene===1)WALK.tgt=Math.max(0,Math.min(WALK.L,WALK.tgt+d))};
+addEventListener('wheel',e=>step(e.deltaY*.008),{passive:true});
+let ty=null;addEventListener('touchstart',e=>ty=e.touches[0].clientY,{passive:true});
+addEventListener('touchmove',e=>{const y=e.touches[0].clientY;if(ty!==null)step((ty-y)*.025);ty=y},{passive:true});
+addEventListener('keydown',e=>{if(['ArrowDown','PageDown',' ','ArrowUp'].includes(e.key)){step(e.key==='ArrowUp'?-.8:.8);if(scene===1)e.preventDefault()}});
+$('enter').onclick=()=>{if(bg)bg.play().catch(()=>{});go(1)};
+$('b1').onclick=()=>go(2);$('b2').onclick=()=>go(3);$('b3').onclick=()=>go(4);
+
+/* garden */
+const g=$('garden');let opened=0;
+CFG.flowers.forEach(f=>{
+  const b=document.createElement('button');b.className='fl';b.innerHTML=fl(f.k,'64');b.setAttribute('aria-label',f.t);
+  b.onclick=()=>{
+    if(!b.classList.contains('open')){b.classList.add('open');opened++;const r=b.getBoundingClientRect();
+      for(let i=0;i<8;i++)spawn(r.left+r.width/2,r.top,true)}
+    $('msg').innerHTML='<b></b><br><span></span>';
+    $('msg').querySelector('b').textContent=f.t;$('msg').querySelector('span').textContent=f.m;
+    if(opened===CFG.flowers.length)$('b4').classList.remove('hid')};
+  g.appendChild(b)});
+$('b4').onclick=()=>go(5);
+$('b5').onclick=()=>go(6);
+
+/* bouquet */
+$('pick').onclick=()=>{
+  $('bq').classList.add('up');$('bq').innerHTML=bouquet(true);
+  $('pick').classList.add('hid');burst(70);rate=.4;
+  $('bqName').classList.add('show');setTimeout(()=>$('bqTxt').classList.add('show'),1500);show('b6',3500)};
+$('b6').onclick=()=>go(7);
+
+/* final */
+
+/* ---------- star rating ---------- */
+let sel=0;
+const STAR='<svg viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9.5 16.8,14.3 18.5,21.5 12,17.6 5.5,21.5 7.2,14.3 2,9.5 9,9"/></svg>';
+const paint=n=>[...$('stars').children].forEach((x,j)=>x.classList.toggle('lit',j<n));
+function resetRate(){sel=0;paint(0);$('gif').innerHTML='';$('rmsg').classList.remove('show')}
+function choose(n){
+  $('rmsg').textContent=n===5?CFG.five:CFG.notFive;$('rmsg').classList.add('show');
+  if(n===5){$('gif').innerHTML='';burst(90);return}
+  if(CFG.gifFile){$('gif').innerHTML=`<img src="${CFG.gifFile}" alt="">`;return}
+  $('gif').innerHTML=`<div class="tenor-gif-embed" data-postid="${CFG.tenorId}" data-share-method="host" data-aspect-ratio="1.36066" data-width="100%"></div>`;
+  const sc=document.createElement('script');sc.async=true;sc.src='https://tenor.com/embed.js';document.body.appendChild(sc)
+}
+for(let i=1;i<=5;i++){const b=document.createElement('button');b.className='star';b.setAttribute('aria-label',i+' stars');b.innerHTML=STAR;
+  b.onmouseenter=()=>paint(i);b.onclick=()=>{sel=i;paint(i);choose(i)};$('stars').appendChild(b)}
+$('stars').onmouseleave=()=>paint(sel);
+$('keep').onclick=()=>{burst(90);$('keepTxt').classList.add('show');$('keep').classList.add('hid')};
+$('again').onclick=()=>{resetRate();
+  opened=0;document.querySelectorAll('.fl').forEach(f=>f.classList.remove('open'));$('msg').innerHTML='';$('b4').classList.add('hid');
+  ['b1','b2','b3','b6','pick'].forEach(id=>$(id).classList.add('hid'));$('pick').classList.remove('hid');
+  ['apName','apTxt','bqName','bqTxt','keepTxt'].forEach(id=>$(id).classList.remove('show'));
+  $('keep').classList.remove('hid');$('bq').classList.remove('up');
+  $('bq').innerHTML=bouquet(false);
+  go(0)};
+go(0);
+</script>
+</body>
+</html>
